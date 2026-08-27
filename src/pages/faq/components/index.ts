@@ -1,0 +1,1 @@
+export { FAQPageAccordionItem } from "./FAQPageAccordionItem";

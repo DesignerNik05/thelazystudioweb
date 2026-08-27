@@ -1,0 +1,87 @@
+# ============================================================
+# The Lazy Studio — Apache config for GoDaddy cPanel hosting.
+#
+# Vite copies this file into dist/, so it ships with every build.
+# Upload the CONTENTS of dist/ into public_html/ on the server.
+# ============================================================
+
+Options -Indexes
+
+# index.php must stay in the list: DirectoryIndex cascades into subdirectories,
+# and /rms/ is a WordPress install served by index.php. Dropping it makes every
+# subdirectory without an index.html return 403.
+DirectoryIndex index.html index.php
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # 1. Force HTTPS. Must come before the SPA rule below.
+  RewriteCond %{HTTPS} !=on
+  RewriteCond %{HTTP:X-Forwarded-Proto} !https
+  RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
+
+  # 2. Canonical host — strip www so the domain has one address.
+  RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+  RewriteRule ^(.*)$ https://%1/$1 [R=301,L]
+
+  # 3. Client-side routing: anything that is not a real file or directory
+  #    is served index.html so React Router can resolve it. Without this,
+  #    loading /portfolio directly returns an Apache 404.
+  #
+  #    /rms/ is a separate live WordPress install sharing this docroot. It has
+  #    its own .htaccess (so mod_rewrite would not inherit these rules anyway),
+  #    but exclude it explicitly so this can never hijack its routing.
+  RewriteCond %{REQUEST_URI} !^/rms/
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /index.html [L]
+</IfModule>
+
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/css text/xml
+  AddOutputFilterByType DEFLATE application/javascript application/json
+  AddOutputFilterByType DEFLATE image/svg+xml application/xml
+  # WebP and woff2 are already compressed — recompressing wastes CPU.
+</IfModule>
+
+<IfModule mod_expires.c>
+  ExpiresActive On
+
+  # index.html must never be cached, or visitors keep the old asset hashes
+  # and never see a deploy.
+  ExpiresByType text/html "access plus 0 seconds"
+
+  # Vite fingerprints JS/CSS filenames, so these are safe to cache hard.
+  ExpiresByType application/javascript "access plus 1 year"
+  ExpiresByType text/css "access plus 1 year"
+  ExpiresByType font/woff2 "access plus 1 year"
+
+  # Images keep stable filenames, so cache them for a week rather than a year.
+  ExpiresByType image/webp "access plus 1 week"
+  ExpiresByType image/svg+xml "access plus 1 week"
+</IfModule>
+
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  <FilesMatch "\.html$">
+    Header set Cache-Control "no-cache, must-revalidate"
+  </FilesMatch>
+</IfModule>
+
+# Carried over from the WordPress .htaccess this file replaces. <Files> rules
+# cascade into subdirectories, so removing it would weaken /rms/ protection.
+<Files wp-config.php>
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+</Files>
+
+# Only for this app's own paths — /rms/ handles its own 404s through WordPress.
+ErrorDocument 404 /index.html

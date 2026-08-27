@@ -4,3 +4,15 @@ dist
 *.log
 hero-preview*.png
 *preview*.png
+
+# Claude Code — local only (rules/ IS tracked)
+.claude/settings.local.json
+.claude/launch.json
+
+# Local env files — never commit real keys
+.env
+.env.*
+!.env.example
+
+# Build artifacts for upload
+release/
