@@ -186,9 +186,26 @@ third-party endpoint.
 npm run release        # build + zip to release/thelazystudio-NNN.zip
 ```
 
-Then in cPanel: File Manager → `public_html` → remove the previous build → upload the zip →
-right-click → Extract. Turn on **Show Hidden Files** and confirm `.htaccess` landed — without it
-every client-side route returns an Apache 404.
+Then in cPanel File Manager → `public_html`:
+
+1. **Delete `index.html`, `.htaccess`, and `assets/` first.** cPanel's Extract **silently skips
+   files that already exist** — it does not overwrite. Skipping this step means the new build
+   extracts but `index.html` and `.htaccess` stay on the old version, and nothing appears to change.
+   This is the single easiest way to break a deploy here.
+2. Upload the zip, then right-click → **Extract** into `/public_html`.
+3. Enable **Settings → Show Hidden Files** and confirm `.htaccess` landed.
+4. Delete the uploaded zip — anything in `public_html` is publicly downloadable.
+5. Verify a deep route (`/portfolio`) and `/rms/` both return 200.
+
+### `public_html` is shared — do not clear it
+
+The docroot is **not** exclusively this site. It also contains:
+
+- **`rms/`** — a live WordPress install serving `thelazystudio.com/rms/`. Leave it alone.
+- `thelazystudio.com/` — an empty directory, returns 403.
+- `rms.zip` (112 MB) and `wp-admin.zip` (71 MB) — see Known issues.
+
+Only ever remove `index.html`, `.htaccess`, `favicon.svg`, and `assets/` — the files this build owns.
 
 ### `public/.htaccess` is load-bearing
 
@@ -198,6 +215,10 @@ Vite copies it into `dist/` on every build. It does four things, and the order m
 2. Strips `www.` so the domain has one canonical address
 3. Serves `index.html` for any path that is not a real file — this is what makes React Router work
 4. Sets cache headers: `index.html` never cached, fingerprinted JS/CSS cached for a year
+
+`DirectoryIndex` **must** list `index.php` as well as `index.html`. The directive cascades into
+subdirectories, so `DirectoryIndex index.html` alone stops `/rms/` finding its `index.php`, and
+`Options -Indexes` turns that into a 403. This took the WordPress site down once; don't repeat it.
 
 Never cache `index.html`. Visitors would keep old asset hashes and never see a deploy.
 

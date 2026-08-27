@@ -6,7 +6,11 @@
 # ============================================================
 
 Options -Indexes
-DirectoryIndex index.html
+
+# index.php must stay in the list: DirectoryIndex cascades into subdirectories,
+# and /rms/ is a WordPress install served by index.php. Dropping it makes every
+# subdirectory without an index.html return 403.
+DirectoryIndex index.html index.php
 
 <IfModule mod_rewrite.c>
   RewriteEngine On
@@ -24,6 +28,11 @@ DirectoryIndex index.html
   # 3. Client-side routing: anything that is not a real file or directory
   #    is served index.html so React Router can resolve it. Without this,
   #    loading /portfolio directly returns an Apache 404.
+  #
+  #    /rms/ is a separate live WordPress install sharing this docroot. It has
+  #    its own .htaccess (so mod_rewrite would not inherit these rules anyway),
+  #    but exclude it explicitly so this can never hijack its routing.
+  RewriteCond %{REQUEST_URI} !^/rms/
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteRule . /index.html [L]
@@ -62,4 +71,17 @@ DirectoryIndex index.html
   </FilesMatch>
 </IfModule>
 
+# Carried over from the WordPress .htaccess this file replaces. <Files> rules
+# cascade into subdirectories, so removing it would weaken /rms/ protection.
+<Files wp-config.php>
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+</Files>
+
+# Only for this app's own paths — /rms/ handles its own 404s through WordPress.
 ErrorDocument 404 /index.html
