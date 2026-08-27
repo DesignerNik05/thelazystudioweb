@@ -17,8 +17,9 @@ const ProcessPage = () => {
         <SiteHeader activePage="process" />
         <img
           className="process-page-hero__image"
-          src="/assets/lazy-studio-hero.png"
+          src="/assets/lazy-studio-hero.webp"
           alt="Cinematic red and blue lit creative technologist in a dark studio"
+          fetchPriority="high"
         />
         <div className="process-page-hero__shade" />
         <p className="process-page-hero__ghost" aria-hidden="true">

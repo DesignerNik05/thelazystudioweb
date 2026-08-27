@@ -1,5 +1,6 @@
 import type { ChangeEvent, FormEvent } from "react";
 import { contactSchema, ERROR_MESSAGES, SUCCESS_MESSAGES } from "@/constants";
+import { ENV, isContactConfigured } from "@/config";
 
 type FormStatus = "idle" | "sending" | "sent" | "error";
 import { Link } from "react-router-dom";
@@ -65,13 +66,25 @@ const ContactPage = () => {
       return;
     }
 
+    // No endpoint configured yet — say so rather than pretending to send.
+    if (!isContactConfigured()) {
+      setFormError(ERROR_MESSAGES.SUBMIT_FAILED);
+      setFormStatus("error");
+      return;
+    }
+
     setFormStatus("sending");
 
     try {
-      const response = await fetch("/api/contact", {
+      const response = await fetch(ENV.CONTACT_ENDPOINT, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(parsed.data),
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({
+          ...parsed.data,
+          // Web3Forms requires its public key in the body; Formspree ignores it.
+          ...(ENV.CONTACT_ACCESS_KEY ? { access_key: ENV.CONTACT_ACCESS_KEY } : {}),
+          _subject: `New enquiry — ${parsed.data.name}`,
+        }),
       });
 
       if (!response.ok) {
@@ -96,8 +109,9 @@ const ContactPage = () => {
         <SiteHeader activePage="contact" />
         <img
           className="contact-page-hero__image"
-          src="/assets/lazy-studio-hero.png"
+          src="/assets/lazy-studio-hero.webp"
           alt="Cinematic red and blue lit creative technologist in a dark studio"
+          fetchPriority="high"
         />
         <div className="contact-page-hero__shade" />
         <p className="contact-page-hero__ghost" aria-hidden="true">

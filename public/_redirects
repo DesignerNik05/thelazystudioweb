@@ -1,4 +1,0 @@
-# Netlify / Cloudflare Pages SPA fallback.
-# Client-side routing means every path must serve index.html; without this,
-# a direct load or refresh of /portfolio returns a 404 from the host.
-/*  /index.html  200

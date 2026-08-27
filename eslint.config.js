@@ -54,9 +54,10 @@ export default tseslint.config(
     languageOptions: { globals: { ...globals.node, ...globals.vitest } },
   },
 
-  // Config files run in Node
+  // Config files and build scripts run in Node
   {
-    files: ["*.config.{js,mjs,ts}", "eslint.config.js"],
+    files: ["*.config.{js,mjs,ts}", "eslint.config.js", "scripts/**/*.mjs"],
     languageOptions: { globals: globals.node },
+    rules: { "no-console": "off" },
   },
 );

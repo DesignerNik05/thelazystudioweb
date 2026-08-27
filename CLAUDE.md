@@ -58,16 +58,16 @@ instructions for something you can run. (See also `AGENTS.md` for prototype-work
 
 ## Tech Stack — Approved Libraries Only
 
-| Purpose         | Library                         | Notes                                                       |
-| --------------- | ------------------------------- | ----------------------------------------------------------- |
-| UI components   | **shadcn/ui**                   | ONLY UI library — no MUI, Ant, Chakra, Mantine              |
-| Styling         | **Tailwind CSS v4**             | Utility classes + a thin custom layer for cinematic effects |
-| Forms           | **React Hook Form + Zod**       | Contact form and newsletter only                            |
-| Routing         | **React Router v7**             | All routes under `src/router/`                              |
-| Icons           | **Lucide React**                | Ships with shadcn/ui                                        |
-| Toasts          | **Sonner**                      | Via shadcn/ui `<Sonner>`                                    |
-| Dates           | **date-fns**                    | Blog post dates. Never moment.js                            |
-| Class utilities | **clsx + tailwind-merge + cva** | Required by shadcn/ui internals                             |
+| Purpose         | Library                                                | Notes                                                       |
+| --------------- | ------------------------------------------------------ | ----------------------------------------------------------- |
+| UI components   | **shadcn/ui**                                          | ONLY UI library — no MUI, Ant, Chakra, Mantine              |
+| Styling         | **Tailwind CSS v4**                                    | Utility classes + a thin custom layer for cinematic effects |
+| Forms           | **React Hook Form + Zod**                              | Contact form and newsletter only                            |
+| Routing         | React Router v7, code-split, legacy aliases + real 404 | same                                                        | **done** |
+| Icons           | **Lucide React**                                       | Ships with shadcn/ui                                        |
+| Toasts          | **Sonner**                                             | Via shadcn/ui `<Sonner>`                                    |
+| Dates           | **date-fns**                                           | Blog post dates. Never moment.js                            |
+| Class utilities | **clsx + tailwind-merge + cva**                        | Required by shadcn/ui internals                             |
 
 Adding any library not in this table requires team approval first.
 
@@ -175,14 +175,56 @@ import { services } from "../../data/services";
 
 ---
 
+## Deployment — GoDaddy cPanel
+
+The site is hosted on **GoDaddy Web Hosting Economy** (shared Apache/cPanel) at
+**thelazystudio.com**. It is a static build: there is **no Node runtime on the server**, so no
+serverless functions, no SSR, and no API routes. Anything needing a backend must go to a
+third-party endpoint.
+
+```bash
+npm run release        # build + zip to release/thelazystudio-NNN.zip
+```
+
+Then in cPanel: File Manager → `public_html` → remove the previous build → upload the zip →
+right-click → Extract. Turn on **Show Hidden Files** and confirm `.htaccess` landed — without it
+every client-side route returns an Apache 404.
+
+### `public/.htaccess` is load-bearing
+
+Vite copies it into `dist/` on every build. It does four things, and the order matters:
+
+1. Forces HTTPS (before the SPA rule, or the redirect loses the path)
+2. Strips `www.` so the domain has one canonical address
+3. Serves `index.html` for any path that is not a real file — this is what makes React Router work
+4. Sets cache headers: `index.html` never cached, fingerprinted JS/CSS cached for a year
+
+Never cache `index.html`. Visitors would keep old asset hashes and never see a deploy.
+
+### Contact form
+
+There is no server to post to, so the form submits to a third-party endpoint set at **build time**:
+
+```
+VITE_CONTACT_ENDPOINT     Formspree or Web3Forms URL
+VITE_CONTACT_ACCESS_KEY   Web3Forms only; blank for Formspree
+```
+
+Put these in `.env.production.local` **before** running `npm run release` — `VITE_*` values are
+inlined into the bundle at build time, not read at runtime. Rebuilding is required to change them.
+
+They are public by design (visible in any submitted request), which is why a form backend is
+appropriate and a private API key is not. Never put a secret in a `VITE_*` variable.
+
+Until `VITE_CONTACT_ENDPOINT` is set, the form shows an honest error with a mailto fallback and
+keeps what the visitor typed. It must never claim success for a message it did not send.
+
 ## Known issues to fix
 
 Ordered by severity. Fix these as you touch the surrounding code.
 
-1. **The contact form needs its environment variables before it will deliver.** The endpoint
-   (`api/contact.ts`) is written and wired, but until `RESEND_API_KEY` and `CONTACT_TO` are set in
-   Vercel it returns 500 and the form shows an honest failure with a mailto fallback. See
-   `.env.example`. It never claims success — verify that stays true if you touch it.
+1. **The contact form has no delivery endpoint yet.** Create a Formspree or Web3Forms account, put
+   the URL in `VITE_CONTACT_ENDPOINT`, and rebuild. Until then it fails honestly — see Deployment.
 2. **No Open Graph image.** `summary_large_image` is declared with no image, so link previews fall
    back to a plain card. Needs a 1200x630 PNG at `public/assets/og-cover.png`, an `og:image` tag in
    `index.html`, and the absolute URL in `SITE`.

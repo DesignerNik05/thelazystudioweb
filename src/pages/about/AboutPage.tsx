@@ -9,8 +9,9 @@ const AboutPage = () => {
         <SiteHeader activePage="about" />
         <img
           className="about-page-hero__image"
-          src="/assets/lazy-studio-hero.png"
+          src="/assets/lazy-studio-hero.webp"
           alt="Cinematic red and blue lit creative technologist in a dark studio"
+          fetchPriority="high"
         />
         <div className="about-page-hero__shade" />
         <p className="about-page-hero__ghost" aria-hidden="true">
@@ -100,8 +101,10 @@ const AboutPage = () => {
         <div className="about-collective-section__inner">
           <figure className="about-collective-visual">
             <img
-              src="/assets/marquee-consultant.png"
+              src="/assets/marquee-consultant.webp"
               alt="Creative strategist in a dark studio workspace"
+              loading="lazy"
+              decoding="async"
             />
             <figcaption>
               <span>Collective mode</span>

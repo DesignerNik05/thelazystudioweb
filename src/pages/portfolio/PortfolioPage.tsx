@@ -22,8 +22,9 @@ const PortfolioPage = () => {
         <SiteHeader activePage="portfolio" />
         <img
           className="portfolio-page-hero__image"
-          src="/assets/lazy-studio-hero.png"
+          src="/assets/lazy-studio-hero.webp"
           alt="Cinematic red and blue lit creative technologist in a dark studio"
+          fetchPriority="high"
         />
         <div className="portfolio-page-hero__shade" />
         <p className="portfolio-page-hero__ghost" aria-hidden="true">

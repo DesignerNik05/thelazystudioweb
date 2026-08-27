@@ -20,8 +20,9 @@ const BlogListingPage = () => {
         <SiteHeader activePage="blog" />
         <img
           className="blog-listing-hero__image"
-          src="/assets/lazy-studio-hero.png"
+          src="/assets/lazy-studio-hero.webp"
           alt="Cinematic red and blue lit creative technologist in a dark studio"
+          fetchPriority="high"
         />
         <div className="blog-listing-hero__shade" />
         <div className="blog-listing-hero__content">
@@ -50,7 +51,7 @@ const BlogListingPage = () => {
                 filteredPosts.map((post) => (
                   <article className="listing-post-card" key={post.title}>
                     <Link className="listing-post-card__media" to="/blog" aria-label={post.title}>
-                      <img src={post.image} alt={post.alt} />
+                      <img src={post.image} alt={post.alt} loading="lazy" decoding="async" />
                     </Link>
                     <div className="listing-post-card__content">
                       <div className="listing-post-card__meta">
@@ -120,7 +121,13 @@ const BlogListingPage = () => {
                 <div className="recent-posts">
                   {blogPosts.slice(0, 3).map((post) => (
                     <Link className="recent-post" to="/blog" key={post.title}>
-                      <img src={post.image} alt="" aria-hidden="true" />
+                      <img
+                        src={post.image}
+                        alt=""
+                        aria-hidden="true"
+                        loading="lazy"
+                        decoding="async"
+                      />
                       <span>
                         <small>{post.date}</small>
                         <strong>{post.title}</strong>

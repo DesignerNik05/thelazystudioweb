@@ -16,8 +16,9 @@ const ServicesPage = () => {
         <SiteHeader activePage="services" />
         <img
           className="services-page-hero__image"
-          src="/assets/lazy-studio-hero.png"
+          src="/assets/lazy-studio-hero.webp"
           alt="Cinematic red and blue lit creative technologist in a dark studio"
+          fetchPriority="high"
         />
         <div className="services-page-hero__shade" />
         <p className="services-page-hero__ghost" aria-hidden="true">

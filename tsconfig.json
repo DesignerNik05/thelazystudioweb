@@ -23,5 +23,5 @@
 
     "paths": { "@/*": ["./src/*"] }
   },
-  "include": ["src", "api", "vite.config.mjs"]
+  "include": ["src", "vite.config.mjs"]
 }

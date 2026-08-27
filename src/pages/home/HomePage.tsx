@@ -246,8 +246,9 @@ const HomePage = () => {
       <section className="hero" id="home" aria-label="The Lazy Studio homepage hero">
         <img
           className="hero__image"
-          src="/assets/lazy-studio-hero.png"
+          src="/assets/lazy-studio-hero.webp"
           alt="A cinematic red and blue lit creative technologist in a dark studio"
+          fetchPriority="high"
         />
         <div className="hero__shade" />
         <div className="hero__red-glow" />
@@ -444,21 +445,37 @@ const HomePage = () => {
         <div className="scroll-marquee scroll-marquee--top">
           <span>Crafting sharp websites</span>
           <img
-            src="/assets/marquee-strategist.png"
+            src="/assets/marquee-strategist.webp"
             alt="Creative strategist in a neon-lit studio"
+            loading="lazy"
+            decoding="async"
           />
           <span>and digital systems</span>
           <img
-            src="/assets/marquee-consultant.png"
+            src="/assets/marquee-consultant.webp"
             alt="Creative consultant in a modern campaign workspace"
+            loading="lazy"
+            decoding="async"
           />
           <span>that feel effortless</span>
         </div>
         <div className="scroll-marquee scroll-marquee--bottom">
           <span>Designing the best interfaces</span>
-          <img src="/assets/marquee-consultant.png" alt="" aria-hidden="true" />
+          <img
+            src="/assets/marquee-consultant.webp"
+            alt=""
+            aria-hidden="true"
+            loading="lazy"
+            decoding="async"
+          />
           <span>for brands that move</span>
-          <img src="/assets/marquee-strategist.png" alt="" aria-hidden="true" />
+          <img
+            src="/assets/marquee-strategist.webp"
+            alt=""
+            aria-hidden="true"
+            loading="lazy"
+            decoding="async"
+          />
           <span>without the noise</span>
         </div>
       </section>
@@ -575,9 +592,11 @@ const HomePage = () => {
               actually fits.
             </p>
             <img
-              src="/assets/faq-liquid-blob.png"
+              src="/assets/faq-liquid-blob.webp"
               alt="Glossy black abstract liquid form"
               className="faq-visual__blob"
+              loading="lazy"
+              decoding="async"
             />
           </aside>
 
@@ -661,7 +680,7 @@ const HomePage = () => {
                 key={post.title}
               >
                 <div className="blog-card__media">
-                  <img src={post.image} alt={post.alt} />
+                  <img src={post.image} alt={post.alt} loading="lazy" decoding="async" />
                 </div>
                 <div className="blog-card__content">
                   <time dateTime={post.datetime}>{post.date}</time>

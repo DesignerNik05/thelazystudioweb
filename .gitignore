@@ -13,3 +13,6 @@ hero-preview*.png
 .env
 .env.*
 !.env.example
+
+# Build artifacts for upload
+release/
