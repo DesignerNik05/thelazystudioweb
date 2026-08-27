@@ -246,24 +246,21 @@ Ordered by severity. Fix these as you touch the surrounding code.
 
 1. **The contact form has no delivery endpoint yet.** Create a Formspree or Web3Forms account, put
    the URL in `VITE_CONTACT_ENDPOINT`, and rebuild. Until then it fails honestly — see Deployment.
-2. **No Open Graph image.** `summary_large_image` is declared with no image, so link previews fall
-   back to a plain card. Needs a 1200x630 PNG at `public/assets/og-cover.png`, an `og:image` tag in
-   `index.html`, and the absolute URL in `SITE`.
-3. **Per-route link previews need prerendering.** `useDocumentMeta` sets titles and OG tags at
+2. **Per-route link previews need prerendering.** `useDocumentMeta` sets titles and OG tags at
    runtime, which Google executes but Slack/WhatsApp/iMessage do not — they read the static tags in
    `index.html`. Every route currently unfurls with the homepage's title. A prerender step
    (`vite-plugin-ssr`, `vite-plugin-prerender`) would fix this properly.
-4. **5.4 MB of unoptimized PNGs**, none lazy-loaded. Convert to WebP/AVIF, lazy-load below the fold.
-5. **Mobile nav is a horizontal scroll strip** where later links sit off-screen with no affordance.
+3. **5.4 MB of unoptimized PNGs**, none lazy-loaded. Convert to WebP/AVIF, lazy-load below the fold.
+4. **Mobile nav is a horizontal scroll strip** where later links sit off-screen with no affordance.
    Replace with a proper menu (shadcn `<Sheet>`).
-6. **`HomePage` still holds ~10 sections inline** (~700 lines). Split into `pages/home/sections/`;
+5. **`HomePage` still holds ~10 sections inline** (~700 lines). Split into `pages/home/sections/`;
    it is the only file left that breaks the ~150-line section guideline.
-7. **The contact form is not on React Hook Form.** It validates with the shared Zod schema but still
+6. **The contact form is not on React Hook Form.** It validates with the shared Zod schema but still
    uses `useState` fields and shows one error at a time rather than inline per-field errors.
    Converting it to RHF (per `.claude/rules/components.md`) would give per-field messages.
-8. **One `react-hooks/exhaustive-deps` warning** in `HomePage` — resolve when the carousel logic is
+7. **One `react-hooks/exhaustive-deps` warning** in `HomePage` — resolve when the carousel logic is
    extracted into a `useCarousel` hook.
-9. **`blogPosts` contains the category `"Website Strategy"`, which is missing from `blogCategories`** —
+8. **`blogPosts` contains the category `"Website Strategy"`, which is missing from `blogCategories`** —
    that post can never be reached by the category filter. A content fix, not a code fix.
 
 ### Fixed during the migration
@@ -277,6 +274,7 @@ Ordered by severity. Fix these as you touch the surrounding code.
 - ~~Plain JS with no type safety~~ — full TypeScript; `npm run build` typechecks before bundling.
 - ~~`<title>` was "Prototype" on every page~~ — per-route metadata in `src/constants/seo.ts`.
 - ~~No favicon~~ — `public/favicon.svg`.
+- ~~No Open Graph image~~ — `npm run og` renders `public/assets/og-cover.png` (1200x630).
 - ~~The contact form faked success~~ — real endpoint; failures now say so and keep the text.
 
 ## Path-Scoped Rules

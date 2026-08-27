@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <style>
+      @font-face {
+        font-family: "Inter";
+        src: url("../../node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2")
+          format("woff2-variations");
+        font-weight: 100 900;
+        font-display: block;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1200px; height: 630px; overflow: hidden; }
+      body {
+        position: relative;
+        background: #050505;
+        font-family: "Inter", sans-serif;
+        color: #ffffff;
+        -webkit-font-smoothing: antialiased;
+      }
+      /* brand wash, mirroring the hero's bottom red glow */
+      .glow {
+        position: absolute; inset: 0;
+        background: radial-gradient(58vw 42vw at 42% 104%, rgba(251,13,31,0.58), rgba(251,13,31,0.13) 45%, rgba(251,13,31,0) 72%);
+      }
+      /* oversized ghost word, as on the site */
+      .ghost {
+        position: absolute; right: -28px; bottom: -118px;
+        font-size: 300px; font-weight: 800; letter-spacing: -0.06em;
+        color: rgba(255,255,255,0.035); line-height: 1;
+      }
+      .inner { position: relative; padding: 72px 84px; height: 100%; display: flex; flex-direction: column; }
+      .mark { display: flex; align-items: center; gap: 14px; }
+      .dot { width: 22px; height: 22px; border-radius: 50%; background: #fb0d1f; }
+      .wordmark { font-size: 31px; font-weight: 600; letter-spacing: -0.01em; }
+      .kicker {
+        margin-top: 86px; color: #fb0d1f; font-size: 19px; font-weight: 700;
+        letter-spacing: 0.14em; text-transform: uppercase;
+      }
+      h1 { margin-top: 26px; font-size: 104px; font-weight: 800; letter-spacing: -0.045em; line-height: 1.04; }
+      .lead { margin-top: 30px; color: #898989; font-size: 27px; font-weight: 400; letter-spacing: -0.005em; }
+    </style>
+  </head>
+  <body>
+    <div class="glow"></div>
+    <div class="ghost">Lazy</div>
+    <div class="inner">
+      <div class="mark"><span class="dot"></span><span class="wordmark">The Lazy Studio</span></div>
+      <p class="kicker">AI-First Design and Development Collective</p>
+      <h1>Work Less.<br />Mean More.</h1>
+      <p class="lead">Premium UI/UX, websites, digital products, and useful AI workflows.</p>
+    </div>
+  </body>
+</html>

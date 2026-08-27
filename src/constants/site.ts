@@ -5,4 +5,6 @@ export const SITE = {
   EMAIL: "hello@thelazystudio.com",
   /** Set to the production origin once the domain is attached — used for canonical + OG URLs. */
   URL: "https://thelazystudio.com",
+  /** Absolute URL required — unfurlers do not resolve relative paths. */
+  OG_IMAGE: "https://thelazystudio.com/assets/og-cover.png",
 } as const;

@@ -16,3 +16,6 @@ hero-preview*.png
 
 # Build artifacts for upload
 release/
+
+# OG render intermediate
+scripts/og/.og-raw.png
