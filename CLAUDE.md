@@ -179,19 +179,28 @@ import { services } from "../../data/services";
 
 Ordered by severity. Fix these as you touch the surrounding code.
 
-1. **The contact form sends nothing.** It is a 650ms `setTimeout` that then shows "sent" and clears
-   the fields. Visitors get a false success confirmation. The blog search does the same.
-   Never ship a success state for an action that did not happen.
-2. **`<title>` is "Prototype"** on all pages; no meta description, no OG/Twitter tags, no favicon.
-   Metadata is per-route config — see `.claude/rules/constants.md`.
-3. **5.4 MB of unoptimized PNGs**, none lazy-loaded. Convert to WebP/AVIF, lazy-load below the fold.
-4. **Mobile nav is a horizontal scroll strip** where later links sit off-screen with no affordance.
+1. **The contact form needs its environment variables before it will deliver.** The endpoint
+   (`api/contact.ts`) is written and wired, but until `RESEND_API_KEY` and `CONTACT_TO` are set in
+   Vercel it returns 500 and the form shows an honest failure with a mailto fallback. See
+   `.env.example`. It never claims success — verify that stays true if you touch it.
+2. **No Open Graph image.** `summary_large_image` is declared with no image, so link previews fall
+   back to a plain card. Needs a 1200x630 PNG at `public/assets/og-cover.png`, an `og:image` tag in
+   `index.html`, and the absolute URL in `SITE`.
+3. **Per-route link previews need prerendering.** `useDocumentMeta` sets titles and OG tags at
+   runtime, which Google executes but Slack/WhatsApp/iMessage do not — they read the static tags in
+   `index.html`. Every route currently unfurls with the homepage's title. A prerender step
+   (`vite-plugin-ssr`, `vite-plugin-prerender`) would fix this properly.
+4. **5.4 MB of unoptimized PNGs**, none lazy-loaded. Convert to WebP/AVIF, lazy-load below the fold.
+5. **Mobile nav is a horizontal scroll strip** where later links sit off-screen with no affordance.
    Replace with a proper menu (shadcn `<Sheet>`).
-5. **`HomePage` still holds ~10 sections inline** (~700 lines). Split into `pages/home/sections/`;
+6. **`HomePage` still holds ~10 sections inline** (~700 lines). Split into `pages/home/sections/`;
    it is the only file left that breaks the ~150-line section guideline.
-6. **One `react-hooks/exhaustive-deps` warning** in `HomePage` — resolve when the carousel logic is
-   extracted into a `useCarousel` hook (see `.claude/rules/structure.md`).
-7. **`blogPosts` contains the category `"Website Strategy"`, which is missing from `blogCategories`** —
+7. **The contact form is not on React Hook Form.** It validates with the shared Zod schema but still
+   uses `useState` fields and shows one error at a time rather than inline per-field errors.
+   Converting it to RHF (per `.claude/rules/components.md`) would give per-field messages.
+8. **One `react-hooks/exhaustive-deps` warning** in `HomePage` — resolve when the carousel logic is
+   extracted into a `useCarousel` hook.
+9. **`blogPosts` contains the category `"Website Strategy"`, which is missing from `blogCategories`** —
    that post can never be reached by the category filter. A content fix, not a code fix.
 
 ### Fixed during the migration
@@ -203,6 +212,9 @@ Ordered by severity. Fix these as you touch the surrounding code.
 - ~~`.npmrc` hardcodes a machine-specific cache path~~ — removed.
 - ~~393 hardcoded hex values~~ — 520 literals replaced by 19 tokens.
 - ~~Plain JS with no type safety~~ — full TypeScript; `npm run build` typechecks before bundling.
+- ~~`<title>` was "Prototype" on every page~~ — per-route metadata in `src/constants/seo.ts`.
+- ~~No favicon~~ — `public/favicon.svg`.
+- ~~The contact form faked success~~ — real endpoint; failures now say so and keep the text.
 
 ## Path-Scoped Rules
 

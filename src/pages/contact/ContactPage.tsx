@@ -1,6 +1,7 @@
 import type { ChangeEvent, FormEvent } from "react";
+import { contactSchema, ERROR_MESSAGES, SUCCESS_MESSAGES } from "@/constants";
 
-type FormStatus = "idle" | "sending" | "sent";
+type FormStatus = "idle" | "sending" | "sent" | "error";
 import { Link } from "react-router-dom";
 import { SmartLink } from "@/components/common";
 import { useState } from "react";
@@ -15,6 +16,7 @@ import {
 const ContactPage = () => {
   const [formData, setFormData] = useState(initialContactForm);
   const [formStatus, setFormStatus] = useState<FormStatus>("idle");
+  const [formError, setFormError] = useState<string | null>(null);
   const isSending = formStatus === "sending";
 
   const updateField = (
@@ -27,8 +29,9 @@ const ContactPage = () => {
         ? target.checked
         : target.value;
 
-    if (formStatus === "sent") {
+    if (formStatus === "sent" || formStatus === "error") {
       setFormStatus("idle");
+      setFormError(null);
     }
 
     setFormData((current) => ({
@@ -38,8 +41,9 @@ const ContactPage = () => {
   };
 
   const chooseProjectType = (projectType: string) => {
-    if (formStatus === "sent") {
+    if (formStatus === "sent" || formStatus === "error") {
       setFormStatus("idle");
+      setFormError(null);
     }
 
     setFormData((current) => ({
@@ -48,14 +52,42 @@ const ContactPage = () => {
     }));
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setFormError(null);
+
+    // Same schema the API validates against, so the two can never disagree.
+    const parsed = contactSchema.safeParse(formData);
+    if (!parsed.success) {
+      const first = parsed.error.issues[0];
+      setFormError(first ? first.message : ERROR_MESSAGES.GENERIC);
+      setFormStatus("error");
+      return;
+    }
+
     setFormStatus("sending");
 
-    window.setTimeout(() => {
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(parsed.data),
+      });
+
+      if (!response.ok) {
+        const body = (await response.json().catch(() => null)) as { error?: string } | null;
+        setFormError(body?.error ?? ERROR_MESSAGES.SUBMIT_FAILED);
+        setFormStatus("error");
+        return;
+      }
+
       setFormStatus("sent");
       setFormData({ ...initialContactForm });
-    }, 650);
+    } catch {
+      // Network failure, offline, blocked request — never claim it was sent.
+      setFormError(ERROR_MESSAGES.SUBMIT_FAILED);
+      setFormStatus("error");
+    }
   };
 
   return (
@@ -254,10 +286,19 @@ const ContactPage = () => {
                 <button className="button button--primary" type="submit" disabled={isSending}>
                   {isSending ? "Sending..." : "Send enquiry"}
                 </button>
-                <p aria-live="polite">
+                <p
+                  aria-live="polite"
+                  className={
+                    formStatus === "error"
+                      ? "contact-form__status is-error"
+                      : "contact-form__status"
+                  }
+                >
                   {formStatus === "sent"
-                    ? "Thanks. The frontend success state is working. Next step: connect this form to email."
-                    : "No pressure, no pitch theatre. Just enough context to start properly."}
+                    ? SUCCESS_MESSAGES.MESSAGE_SENT
+                    : formStatus === "error"
+                      ? formError
+                      : "No pressure, no pitch theatre. Just enough context to start properly."}
                 </p>
               </div>
             </form>
