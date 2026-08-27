@@ -62,5 +62,7 @@ await rm(RAW, { force: true });
 
 const before = meta.size ?? (await stat(RAW).catch(() => ({ size: 0 }))).size;
 const { size } = await stat(OUT);
-console.log(`\n  ${OUT.replace(process.cwd() + "/", "")}  ${WIDTH}x${HEIGHT}  ${(size / 1024).toFixed(0)} kB`);
+console.log(
+  `\n  ${OUT.replace(process.cwd() + "/", "")}  ${WIDTH}x${HEIGHT}  ${(size / 1024).toFixed(0)} kB`,
+);
 if (before) console.log(`  (optimised from ${(before / 1024).toFixed(0)} kB)`);

@@ -251,16 +251,14 @@ Ordered by severity. Fix these as you touch the surrounding code.
    `index.html`. Every route currently unfurls with the homepage's title. A prerender step
    (`vite-plugin-ssr`, `vite-plugin-prerender`) would fix this properly.
 3. **5.4 MB of unoptimized PNGs**, none lazy-loaded. Convert to WebP/AVIF, lazy-load below the fold.
-4. **Mobile nav is a horizontal scroll strip** where later links sit off-screen with no affordance.
-   Replace with a proper menu (shadcn `<Sheet>`).
-5. **`HomePage` still holds ~10 sections inline** (~700 lines). Split into `pages/home/sections/`;
+4. **`HomePage` still holds ~10 sections inline** (~700 lines). Split into `pages/home/sections/`;
    it is the only file left that breaks the ~150-line section guideline.
-6. **The contact form is not on React Hook Form.** It validates with the shared Zod schema but still
+5. **The contact form is not on React Hook Form.** It validates with the shared Zod schema but still
    uses `useState` fields and shows one error at a time rather than inline per-field errors.
    Converting it to RHF (per `.claude/rules/components.md`) would give per-field messages.
-7. **One `react-hooks/exhaustive-deps` warning** in `HomePage` — resolve when the carousel logic is
+6. **One `react-hooks/exhaustive-deps` warning** in `HomePage` — resolve when the carousel logic is
    extracted into a `useCarousel` hook.
-8. **`blogPosts` contains the category `"Website Strategy"`, which is missing from `blogCategories`** —
+7. **`blogPosts` contains the category `"Website Strategy"`, which is missing from `blogCategories`** —
    that post can never be reached by the category filter. A content fix, not a code fix.
 
 ### Fixed during the migration
@@ -274,6 +272,7 @@ Ordered by severity. Fix these as you touch the surrounding code.
 - ~~Plain JS with no type safety~~ — full TypeScript; `npm run build` typechecks before bundling.
 - ~~`<title>` was "Prototype" on every page~~ — per-route metadata in `src/constants/seo.ts`.
 - ~~No favicon~~ — `public/favicon.svg`.
+- ~~Mobile nav hid links in a scroll strip~~ — real menu below 1000px; header is full-bleed.
 - ~~No Open Graph image~~ — `npm run og` renders `public/assets/og-cover.png` (1200x630).
 - ~~The contact form faked success~~ — real endpoint; failures now say so and keep the text.
 

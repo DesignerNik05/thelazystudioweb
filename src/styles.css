@@ -136,24 +136,72 @@ a {
   opacity: 0.9;
 }
 
+/* Full-bleed bar; the content inside stays aligned to the page gutters. */
 .header {
   position: fixed;
   z-index: 20;
-  top: 24px;
-  left: 50%;
+  top: 0;
+  right: 0;
+  left: 0;
   display: flex;
-  width: min(1200px, calc(100% - 48px));
+  justify-content: center;
+  border-bottom: 1px solid var(--border);
+  background: var(--scrim-heavy);
+  backdrop-filter: blur(18px);
+}
+
+.header__inner {
+  display: flex;
+  width: 100%;
+  max-width: 1440px;
   min-height: 74px;
   align-items: center;
   justify-content: space-between;
-  gap: 28px;
-  padding: 12px 14px 12px 28px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  /* Gap and gutters shrink with the viewport so the nav fits for longer. */
+  gap: clamp(12px, 2vw, 32px);
+  padding-block: 10px;
+  padding-inline: clamp(20px, 4vw, 64px);
+}
+
+/* Hamburger. Hidden on desktop; the only nav affordance below 960px. */
+.header__toggle {
+  display: none;
+  width: 46px;
+  height: 46px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0;
+  border: 1px solid var(--border);
   border-radius: 999px;
-  background: rgba(16, 16, 18, 0.72);
-  box-shadow: 0 24px 90px rgba(0, 0, 0, 0.34);
-  backdrop-filter: blur(18px);
-  transform: translateX(-50%);
+  background: var(--surface-glass, rgba(255, 255, 255, 0.04));
+  cursor: pointer;
+}
+
+.header__toggle span {
+  display: block;
+  width: 18px;
+  height: 1.5px;
+  border-radius: 2px;
+  background: var(--foreground);
+  transition:
+    transform 150ms ease,
+    opacity 150ms ease;
+}
+
+.header.is-menu-open .header__toggle span:first-child {
+  transform: translateY(3.75px) rotate(45deg);
+}
+
+.header.is-menu-open .header__toggle span:last-child {
+  transform: translateY(-3.75px) rotate(-45deg);
+}
+
+/* Only shown inside the mobile menu — see the 960px block. The parent
+   selector is needed to outrank the .header__cta display rule below. */
+.header .header__cta--in-menu {
+  display: none;
 }
 
 .wordmark {
@@ -179,7 +227,7 @@ a {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: clamp(0px, 0.6vw, 8px);
 }
 
 .nav__link {
@@ -215,6 +263,7 @@ a {
 .header__cta {
   min-height: 52px;
   padding: 0 26px;
+  white-space: nowrap;
   background: var(--primary);
   color: var(--foreground);
   font-size: 14px;
@@ -6868,6 +6917,69 @@ blockquote strong {
   text-transform: capitalize;
 }
 
+/* ------------------------------------------------------------------
+   Header breakpoints. Measured: wordmark 168 + nav 679 + CTA 153 + gutters
+   means the full bar needs ~1120px. Links tighten first, then the whole nav
+   collapses into a menu — so the bar never overflows its own container.
+   ------------------------------------------------------------------ */
+@media (max-width: 1280px) {
+  .nav__link {
+    padding: 13px 10px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 1000px) {
+  .header__toggle {
+    display: inline-flex;
+  }
+
+  /* The nav becomes a panel under the bar. Previously it was a horizontal
+     scroll strip, which pushed the last four links out of sight with no
+     affordance suggesting they existed. */
+  .nav {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    left: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
+    padding: 12px clamp(20px, 4vw, 64px) 20px;
+    border-bottom: 1px solid var(--border);
+    /* Fully opaque, not the bar's scrim: at 96% the hero's large white
+       headline ghosted through the panel and read as a rendering fault. */
+    background: var(--background);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+  }
+
+  .header:not(.is-menu-open) .nav {
+    display: none;
+  }
+
+  .nav__link {
+    display: flex;
+    width: 100%;
+    min-height: 48px;
+    align-items: center;
+    padding: 13px 15px;
+    font-size: 16px;
+  }
+
+  /* The desktop button is dropped; the menu carries its own copy so the
+     primary action is still reachable on a phone. */
+  .header .header__cta:not(.header__cta--in-menu) {
+    display: none;
+  }
+
+  .header .header__cta--in-menu {
+    display: inline-flex;
+    justify-content: center;
+    min-height: 48px;
+    margin-top: 10px;
+  }
+}
+
 @media (max-width: 1400px) {
   .about-beliefs-grid,
   .about-clients-grid {
@@ -6901,33 +7013,6 @@ blockquote strong {
 }
 
 @media (max-width: 960px) {
-  .header {
-    top: 18px;
-    width: min(720px, calc(100% - 28px));
-    border-radius: 30px;
-    flex-wrap: wrap;
-    gap: 14px;
-    padding: 16px;
-  }
-
-  .nav {
-    order: 3;
-    width: 100%;
-    justify-content: flex-start;
-    gap: 2px;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-
-  .nav::-webkit-scrollbar {
-    display: none;
-  }
-
-  .header__cta {
-    min-height: 44px;
-    padding-inline: 18px;
-  }
-
   .hero__content {
     padding-top: 230px;
   }
@@ -7310,21 +7395,13 @@ blockquote strong {
       );
   }
 
-  .header {
-    width: calc(100% - 24px);
-  }
-
   .wordmark {
     font-size: 17px;
   }
 
   .nav__link {
-    padding: 10px 12px;
-    font-size: 13px;
-  }
-
-  .header__cta {
-    display: none;
+    padding: 10px 14px;
+    font-size: 15px;
   }
 
   .hero__content {
