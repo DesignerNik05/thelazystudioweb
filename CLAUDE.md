@@ -195,13 +195,18 @@ Then in cPanel File Manager → `public_html`:
 2. Upload the zip, then right-click → **Extract** into `/public_html`.
 3. Enable **Settings → Show Hidden Files** and confirm `.htaccess` landed.
 4. Delete the uploaded zip — anything in `public_html` is publicly downloadable.
-5. Verify a deep route (`/portfolio`) and `/rms/` both return 200.
+5. Verify a deep route (`/portfolio`) returns 200, and `/rms/wp-login.php` 200 — `/rms/` itself
+   returns 403 on purpose since 28 Sep 2026 (below).
 
 ### `public_html` is shared — do not clear it
 
 The docroot is **not** exclusively this site. It also contains:
 
-- **`rms/`** — a live WordPress install serving `thelazystudio.com/rms/`. Leave it alone.
+- **`rms/`** — the RMS client's WordPress install. **Taken offline on 28 Sep 2026** (the user's
+  call — the client now has the new site, https://rms-website.akashkalsi9.workers.dev): a
+  Cloudflare security rule on the zone answers `thelazystudio.com/rms` with a 403, except
+  `wp-login.php`, `wp-admin`, `wp-includes` and requests from a signed-in WordPress user. The files
+  and database are untouched — leave them alone; deleting the rule brings the site back.
 - `thelazystudio.com/` — an empty directory, returns 403.
 - `rms.zip` (112 MB) and `wp-admin.zip` (71 MB) — see Known issues.
 
