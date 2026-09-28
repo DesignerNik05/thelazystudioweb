@@ -208,7 +208,6 @@ The docroot is **not** exclusively this site. It also contains:
   `wp-login.php`, `wp-admin`, `wp-includes` and requests from a signed-in WordPress user. The files
   and database are untouched — leave them alone; deleting the rule brings the site back.
 - `thelazystudio.com/` — an empty directory, returns 403.
-- `rms.zip` (112 MB) and `wp-admin.zip` (71 MB) — see Known issues.
 
 Only ever remove `index.html`, `.htaccess`, `favicon.svg`, and `assets/` — the files this build owns.
 
