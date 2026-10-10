@@ -1,7 +1,7 @@
 # The Lazy Studio — Claude Code Guide
 
 > **Previous site design.** Since 5 October 2026 thelazystudio.com serves the new site, built in
-> `~/Downloads/The Lazy Studio Site` (repo akashkalsi9/thelazystudiosite) and hosted on Cloudflare
+> `~/Downloads/The Lazy Studio/Website` (repo akashkalsi9/thelazystudiosite) and hosted on Cloudflare
 > Workers. This project is the site that ran before it, kept for reference. Its last deployed build
 > still sits on GoDaddy (`public_html`) as the fallback: delete the `thelazystudio.com/*` route in
 > Cloudflare (thelazystudio.com → Workers Routes) and it answers again. New site work happens in the
